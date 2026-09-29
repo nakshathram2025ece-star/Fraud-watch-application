@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FraudWatch | Fraud Detection Dashboard</title>
+
+    <!-- Bootstrap 5 -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+
+        /* ================================
+           GLOBAL
+        ================================= */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #1e293b;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* ================================
+           SIDEBAR
+        ================================= */
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: #111827;
+            color: white;
+            padding: 24px 16px;
+            z-index: 1000;
+        }
+
+        .brand {
+            padding: 0 12px 30px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: #2563eb;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .brand h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .brand small {
+            color: #94a3b8;
+        }
+
+        .sidebar-menu {
+            margin-top: 10px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            margin-bottom: 6px;
+            border-radius: 9px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: #1e40af;
+            color: white;
+        }
+
+        .sidebar-link i {
+            font-size: 18px;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 25px;
+            left: 16px;
+            right: 16px;
+        }
+
+        /* ================================
+           MAIN
+        ================================= */
+
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        /* ================================
+           TOPBAR
+        ================================= */
+
+        .topbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-title h5 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .page-title small {
+            color: #64748b;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 13px;
+            background: #ecfdf5;
+            color: #15803d;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        /* ================================
+           CONTENT
+        ================================= */
+
+        .content {
+            padding: 30px;
+        }
+
+        /* ================================
+           STAT CARDS
+        ================================= */
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 22px;
+            height: 100%;
+            transition: 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
+
+        .icon-red {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .icon-orange {
+            background: #ffedd5;
+            color: #ea580c;
+        }
+
+        .icon-blue {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .icon-green {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .stat-title {
+            margin-top: 18px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .stat-number {
+            font-size: 30px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* ================================
+           PANEL
+        ================================= */
+
+        .panel {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 22px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h5 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .panel-header small {
+            color: #64748b;
+        }
+
+        /* ================================
+           FILTERS
+        ================================= */
+
+        .filter-area {
+            padding: 18px 22px;
+            background: #fafbfc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .form-control,
+        .form-select {
+            border-color: #dbe1e8;
+            padding: 10px 12px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.12);
+        }
+
+        /* ================================
+           TABLE
+        ================================= */
+
+        .table {
+            margin: 0;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-weight: 700;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 15px 16px;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            white-space: nowrap;
+        }
+
+        .table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .transaction-id {
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .account {
+            font-weight: 600;
+        }
+
+        .amount {
+            font-weight: 700;
+        }
+
+        /* ================================
+           BADGES
+        ================================= */
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .blocked {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .rule-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .amount-rule {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .velocity-rule {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        /* ================================
+           ACTION BUTTONS
+        ================================= */
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-approve {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .btn-approve:hover {
+            background: #15803d;
+            color: white;
+        }
+
+        .btn-block {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .btn-block:hover {
+            background: #b91c1c;
+            color: white;
+        }
+
+        /* ================================
+           EMPTY
+        ================================= */
+
+        .empty-state {
+            text-align: center;
+            padding: 45px 20px;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        /* ================================
+           RESPONSIVE
+        ================================= */
+
+        @media (max-width: 992px) {
+
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+
+            .brand-text,
+            .sidebar-link span,
+            .sidebar-bottom {
+                display: none;
+            }
+
+            .brand {
+                padding-left: 4px;
+            }
+
+            .sidebar-link {
+                justify-content: center;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .page-title small {
+                display: none;
+            }
+
+            .system-status {
+                font-size: 11px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- =========================================
+     SIDEBAR
+========================================= -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="d-flex align-items-center gap-3">
+
+            <div class="brand-icon">
+                <i class="bi bi-shield-check"></i>
+            </div>
+
+            <div class="brand-text">
+
+                <h4>FraudWatch</h4>
+
+                <small>Security Console</small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="sidebar-menu">
+
+        <a href="#" class="sidebar-link active">
+
+            <i class="bi bi-grid-1x2-fill"></i>
+
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <a href="#transactions" class="sidebar-link">
+
+            <i class="bi bi-credit-card-2-front"></i>
+
+            <span>Transactions</span>
+
+        </a>
+
+
+        <a href="#alerts" class="sidebar-link">
+
+            <i class="bi bi-exclamation-triangle"></i>
+
+            <span>Fraud Alerts</span>
+
+        </a>
+
+
+        <a href="#" class="sidebar-link">
+
+            <i class="bi bi-bar-chart"></i>
+
+            <span>Reports</span>
+
+        </a>
+
+
+        <a href="#" class="sidebar-link">
+
+            <i class="bi bi-gear"></i>
+
+            <span>Settings</span>
+
+        </a>
+
+    </div>
+
+
+    <div class="sidebar-bottom">
+
+        <div class="border-top border-secondary pt-3">
+
+            <small class="text-secondary">
+                Fraud Detection System
+            </small>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+
+<!-- =========================================
+     MAIN CONTENT
+========================================= -->
+
+<div class="main-content">
+
+
+    <!-- TOPBAR -->
+
+    <header class="topbar">
+
+        <div class="page-title">
+
+            <h5>Fraud Monitoring Dashboard</h5>
+
+            <small>
+                Real-time transaction risk monitoring
+            </small>
+
+        </div>
+
+
+        <div class="system-status">
+
+            <span class="online-dot"></span>
+
+            System Online
+
+        </div>
+
+    </header>
+
+
+
+    <!-- CONTENT -->
+
+    <main class="content">
+
+
+        <!-- =====================================
+             WELCOME
+        ====================================== -->
+
+        <div class="mb-4">
+
+            <h3 class="fw-bold mb-1">
+                Security Overview
+            </h3>
+
+            <p class="text-secondary mb-0">
+                Monitor suspicious transactions and review fraud alerts.
+            </p>
+
+        </div>
+
+
+
+        <!-- =====================================
+             STAT CARDS
+        ====================================== -->
+
+        <div class="row g-4 mb-4">
+
+
+            <!-- FLAGGED -->
+
+            <div class="col-xl-3 col-md-6">
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <div>
+
+                            <div class="stat-title mt-0">
+                                Flagged Transactions
+                            </div>
+
+                            <div
+                                    class="stat-number text-danger"
+                                    id="total">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-icon icon-red">
+
+                            <i class="bi bi-shield-exclamation"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- HIGH AMOUNT -->
+
+            <div class="col-xl-3 col-md-6">
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <div>
+
+                            <div class="stat-title mt-0">
+                                High Amount Alerts
+                            </div>
+
+                            <div
+                                    class="stat-number"
+                                    style="color:#ea580c;"
+                                    id="highAmount">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-icon icon-orange">
+
+                            <i class="bi bi-cash-stack"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- RAPID -->
+
+            <div class="col-xl-3 col-md-6">
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <div>
+
+                            <div class="stat-title mt-0">
+                                Rapid Transfer Alerts
+                            </div>
+
+                            <div
+                                    class="stat-number text-primary"
+                                    id="rapid">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-icon icon-blue">
+
+                            <i class="bi bi-lightning-charge"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PENDING -->
+
+            <div class="col-xl-3 col-md-6">
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <div>
+
+                            <div class="stat-title mt-0">
+                                Pending Review
+                            </div>
+
+                            <div
+                                    class="stat-number text-success"
+                                    id="pending">
+
+                                0
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-icon icon-green">
+
+                            <i class="bi bi-clock-history"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =====================================
+             TRANSACTION PANEL
+        ====================================== -->
+
+        <div class="panel" id="transactions">
+
+
+            <!-- HEADER -->
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h5>
+                        Flagged Transactions
+                    </h5>
+
+                    <small>
+                        Review and manage suspicious activity
+                    </small>
+
+                </div>
+
+
+                <button
+                        class="btn btn-primary btn-sm"
+                        onclick="loadTransactions()">
+
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+
+                    Refresh
+
+                </button>
+
+            </div>
+
+
+
+            <!-- FILTER -->
+
+            <div class="filter-area">
+
+                <div class="row g-3">
+
+
+                    <div class="col-lg-5">
+
+                        <div class="input-group">
+
+                            <span class="input-group-text bg-white">
+
+                                <i class="bi bi-search"></i>
+
+                            </span>
+
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="search"
+                                    placeholder="Search sender, receiver, ID..."
+                                    onkeyup="filterTable()">
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-3">
+
+                        <select
+                                class="form-select"
+                                id="ruleFilter"
+                                onchange="filterTable()">
+
+                            <option value="ALL">
+                                All Rules
+                            </option>
+
+                            <option value="AMOUNT">
+                                High Amount
+                            </option>
+
+                            <option value="VELOCITY">
+                                Rapid Transfer
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-lg-3">
+
+                        <select
+                                class="form-select"
+                                id="statusFilter"
+                                onchange="filterTable()">
+
+                            <option value="ALL">
+                                All Status
+                            </option>
+
+                            <option value="PENDING">
+                                Pending
+                            </option>
+
+                            <option value="APPROVED">
+                                Approved
+                            </option>
+
+                            <option value="BLOCKED">
+                                Blocked
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-lg-1">
+
+                        <button
+                                class="btn btn-outline-secondary w-100"
+                                onclick="clearFilters()"
+                                title="Clear Filters">
+
+                            <i class="bi bi-x-lg"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TABLE -->
+
+            <div class="table-responsive">
+
+                <table class="table">
+
+                    <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Sender</th>
+
+                        <th>Receiver</th>
+
+                        <th>Amount</th>
+
+                        <th>Rule</th>
+
+                        <th>Reason</th>
+
+                        <th>Status</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody id="transactionTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================
+     BOOTSTRAP 5 JS
+========================================= -->
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+
+<script>
+
+    /* =========================================
+       GLOBAL DATA
+    ========================================= */
+
+    let transactions = [];
+
+
+
+    /* =========================================
+       LOAD TRANSACTIONS
+    ========================================= */
+
+    function loadTransactions() {
+
+        fetch('/api/flagged')
+
+            .then(response => {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "API request failed"
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                transactions = data;
+
+                updateDashboard();
+
+                filterTable();
+
+            })
+
+            .catch(error => {
+
+                console.error(error);
+
+                document.getElementById(
+                    "transactionTable"
+                ).innerHTML = `
+
+                    <tr>
+
+                        <td colspan="8">
+
+                            <div class="empty-state">
+
+                                <i class="bi bi-exclamation-circle"></i>
+
+                                <div>
+                                    Unable to load flagged transactions
+                                </div>
+
+                                <small>
+                                    Please check whether the Spring Boot server is running.
+                                </small>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            });
+
+    }
+
+
+
+    /* =========================================
+       DASHBOARD COUNTS
+    ========================================= */
+
+    function updateDashboard() {
+
+        document.getElementById("total").innerText =
+            transactions.length;
+
+
+        let highAmount = 0;
+
+        let rapid = 0;
+
+        let pending = 0;
+
+
+        transactions.forEach(item => {
+
+
+            if (
+                item.rule &&
+                item.rule.type === "AMOUNT"
+            ) {
+
+                highAmount++;
+
+            }
+
+
+            if (
+                item.rule &&
+                item.rule.type === "VELOCITY"
+            ) {
+
+                rapid++;
+
+            }
+
+
+            if (
+                item.transaction &&
+                item.transaction.status === "PENDING"
+            ) {
+
+                pending++;
+
+            }
+
+        });
+
+
+        document.getElementById("highAmount").innerText =
+            highAmount;
+
+
+        document.getElementById("rapid").innerText =
+            rapid;
+
+
+        document.getElementById("pending").innerText =
+            pending;
+
+    }
+
+
+
+    /* =========================================
+       DISPLAY TRANSACTIONS
+    ========================================= */
+
+    function displayTransactions(data) {
+
+        const table =
+            document.getElementById(
+                "transactionTable"
+            );
+
+
+        table.innerHTML = "";
+
+
+        if (data.length === 0) {
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td colspan="8">
+
+                        <div class="empty-state">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            <div>
+                                No flagged transactions found
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        data.forEach(item => {
+
+
+            const transaction =
+                item.transaction;
+
+
+            const rule =
+                item.rule;
+
+
+            const status =
+                transaction.status;
+
+
+            /* STATUS */
+
+            let statusClass = "pending";
+
+
+            if (status === "APPROVED") {
+
+                statusClass = "approved";
+
+            }
+
+
+            if (status === "BLOCKED") {
+
+                statusClass = "blocked";
+
+            }
+
+
+
+            /* RULE */
+
+            let ruleClass =
+                rule.type === "AMOUNT"
+                    ? "amount-rule"
+                    : "velocity-rule";
+
+
+
+            /* ACTION */
+
+            let actionButtons = "-";
+
+
+            if (status === "PENDING") {
+
+                actionButtons = `
+
+                    <div class="action-buttons">
+
+                        <button
+                            class="btn-approve"
+                            onclick="approveTransaction(${item.id})">
+
+                            <i class="bi bi-check-lg"></i>
+                            Approve
+
+                        </button>
+
+
+                        <button
+                            class="btn-block"
+                            onclick="blockTransaction(${item.id})">
+
+                            <i class="bi bi-x-lg"></i>
+                            Block
+
+                        </button>
+
+                    </div>
+
+                `;
+
+            }
+
+
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>
+
+                    <span class="transaction-id">
+
+                        #${item.id}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span class="account">
+
+                        ${transaction.sender}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span class="account">
+
+                        ${transaction.receiver}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span class="amount">
+
+                        ₹${Number(
+                transaction.amount
+            ).toLocaleString('en-IN', {
+                minimumFractionDigits: 2
+            })}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span class="rule-badge ${ruleClass}">
+
+                        ${rule.name}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span class="text-secondary">
+
+                        ${item.reason || "-"}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span class="status-badge ${statusClass}">
+
+                        ${status}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    ${actionButtons}
+
+                </td>
+
+            `;
+
+
+            table.appendChild(row);
+
+        });
+
+    }
+
+
+
+    /* =========================================
+       APPROVE
+    ========================================= */
+
+    function approveTransaction(id) {
+
+        if (
+            !confirm(
+                "Are you sure you want to approve this transaction?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        fetch(
+            `/api/flagged/${id}/approve`,
+            {
+                method: "PUT"
+            }
+        )
+
+            .then(response => {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Approve request failed"
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(() => {
+
+                alert(
+                    "Transaction approved successfully."
+                );
+
+                loadTransactions();
+
+            })
+
+            .catch(error => {
+
+                console.error(error);
+
+                alert(
+                    "Unable to approve transaction."
+                );
+
+            });
+
+    }
+
+
+
+    /* =========================================
+       BLOCK
+    ========================================= */
+
+    function blockTransaction(id) {
+
+        if (
+            !confirm(
+                "Are you sure you want to block this transaction?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        fetch(
+            `/api/flagged/${id}/block`,
+            {
+                method: "PUT"
+            }
+        )
+
+            .then(response => {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Block request failed"
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(() => {
+
+                alert(
+                    "Transaction blocked successfully."
+                );
+
+                loadTransactions();
+
+            })
+
+            .catch(error => {
+
+                console.error(error);
+
+                alert(
+                    "Unable to block transaction."
+                );
+
+            });
+
+    }
+
+
+
+    /* =========================================
+       FILTER
+    ========================================= */
+
+    function filterTable() {
+
+        const search =
+            document.getElementById(
+                "search"
+            ).value.toLowerCase();
+
+
+        const rule =
+            document.getElementById(
+                "ruleFilter"
+            ).value;
+
+
+        const status =
+            document.getElementById(
+                "statusFilter"
+            ).value;
+
+
+        const filtered =
+            transactions.filter(item => {
+
+
+                const transaction =
+                    item.transaction;
+
+
+                const searchableText =
+                    JSON.stringify(item)
+                        .toLowerCase();
+
+
+                const matchesSearch =
+                    searchableText.includes(
+                        search
+                    );
+
+
+                const matchesRule =
+                    rule === "ALL" ||
+                    (
+                        item.rule &&
+                        item.rule.type === rule
+                    );
+
+
+                const matchesStatus =
+                    status === "ALL" ||
+                    (
+                        transaction &&
+                        transaction.status === status
+                    );
+
+
+                return (
+                    matchesSearch &&
+                    matchesRule &&
+                    matchesStatus
+                );
+
+            });
+
+
+        displayTransactions(filtered);
+
+    }
+
+
+
+    /* =========================================
+       CLEAR FILTERS
+    ========================================= */
+
+    function clearFilters() {
+
+        document.getElementById(
+            "search"
+        ).value = "";
+
+
+        document.getElementById(
+            "ruleFilter"
+        ).value = "ALL";
+
+
+        document.getElementById(
+            "statusFilter"
+        ).value = "ALL";
+
+
+        filterTable();
+
+    }
+
+
+
+    /* =========================================
+       INITIAL LOAD
+    ========================================= */
+
+    loadTransactions();
+
+</script>
+
+</body>
+</html>
